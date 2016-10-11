@@ -2,6 +2,7 @@ package com.example.wper_smile.file;
 
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
@@ -9,9 +10,11 @@ import android.widget.Toast;
 
 import java.io.BufferedInputStream;
 import java.io.BufferedOutputStream;
+import java.io.BufferedReader;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.InputStream;
+import java.io.InputStreamReader;
 import java.io.OutputStream;
 import java.nio.charset.StandardCharsets;
 
@@ -33,8 +36,8 @@ public class MainActivity extends AppCompatActivity {
                 try {
                     FileOutputStream fileOutputStream=openFileOutput(MyFileName,MODE_PRIVATE);
                     out=new BufferedOutputStream(fileOutputStream);
-                    String name=stuName.getText().toString();
-                    String num=stuNum.getText().toString();
+                    String name="姓名: "+stuName.getText().toString();
+                    String num=" 学号: "+stuNum.getText().toString();
                     try {
                         out.write(name.getBytes(StandardCharsets.UTF_8));
                         out.write(num.getBytes(StandardCharsets.UTF_8));
@@ -53,22 +56,24 @@ public class MainActivity extends AppCompatActivity {
         showDataBtn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                InputStream in=null;
                 try {
-                    FileInputStream fileInputStream = openFileInput(MyFileName);
-                    in=new BufferedInputStream(fileInputStream);
 
-                    int c;
+                    FileInputStream fis = openFileInput(MyFileName);
+                    BufferedInputStream bis = new BufferedInputStream(fis);
+                    BufferedReader reader = new BufferedReader (new InputStreamReader(bis));
+
                     StringBuilder stringBuilder=new StringBuilder("");
                     try{
-                        while ((c=in.read())!=-1) {
-                            stringBuilder.append((char) c);
+                        while (reader.ready()) {
+                            stringBuilder.append((char)reader.read());
                         }
-                        Toast.makeText(MainActivity.this,stringBuilder.toString(),Toast.LENGTH_LONG).show();
+                        Log.v("log",stringBuilder.toString());
+                        Toast.makeText(MainActivity.this,
+                                stringBuilder.toString(),Toast.LENGTH_LONG).show();
                     }
                     finally {
-                        if(in!=null)
-                            in.close();
+                        if(reader!=null)
+                            reader.close();
                     }
                 }
                 catch (Exception e){
